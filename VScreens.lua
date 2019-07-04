@@ -1,36 +1,37 @@
+local L = VScreens_L
 events = {
   ['CHAT_MSG_ACHIEVEMENT'] = {
-    type = "ACHIEVEMENT",
+    type = "SYSTEM",
   },
   ['CHAT_MSG_BG_SYSTEM_ALLIANCE'] = {
-    type = "BG_SYSTEM_ALLIANCE",
+    type = "SYSTEM",
   },
   ['CHAT_MSG_BG_SYSTEM_HORDE'] = {
-    type = "BG_SYSTEM_HORDE",
+    type = "SYSTEM",
   },
   ['CHAT_MSG_BG_SYSTEM_NEUTRAL'] = {
-    type = "BG_SYSTEM_NEUTRAL",
+    type = "SYSTEM",
   },
   ['CHAT_MSG_BN_WHISPER'] = {
-    type = "BN_WHISPER",
+    type = "WHISPER",
   },
   ['CHAT_MSG_BN_WHISPER_INFORM'] = {
-    type = "BN_WHISPER_INFORM",
+    type = "WHISPER",
   },
   ['CHAT_MSG_CHANNEL'] = {
-    type = "CHANNEL",
+    type = nil,
   },
   ['CHAT_MSG_CHANNEL_NOTICE'] = {
-    type = "CHANNEL_NOTICE",
+    type = nil,
   },
   ['CHAT_MSG_EMOTE'] = {
-    type = "EMOTE",
+    type = "SYSTEM",
   },
   ['CHAT_MSG_GUILD'] = {
     type = "GUILD",
   },
   ['CHAT_MSG_GUILD_ACHIEVEMENT'] = {
-    type = "GUILD_ACHIEVEMENT",
+    type = "GUILD",
   },
   ['CHAT_MSG_INSTANCE_CHAT'] = {
     type = "INSTANCE_CHAT",
@@ -42,22 +43,22 @@ events = {
     type = "LOOT",
   },
   ['CHAT_MSG_MONEY'] = {
-    type = "MONEY",
+    type = "SYSTEM",
   },
   ['CHAT_MSG_CURRENCY'] = {
-    type = "CURRENCY",
+    type = "SYSTEM",
   },
   ['CHAT_MSG_MONSTER_EMOTE'] = {
-    type = "MONSTER_EMOTE",
+    type = "SYSTEM",
   },
   ['CHAT_MSG_MONSTER_SAY'] = {
-    type = "MONSTER_SAY",
+    type = "SAY",
   },
   ['CHAT_MSG_MONSTER_WHISPER'] = {
-    type = "MONSTER_WHISPER",
+    type = "WHISPER",
   },
   ['CHAT_MSG_MONSTER_YELL'] = {
-    type = "MONSTER_YELL",
+    type = "YELL",
   },
   ['CHAT_MSG_OFFICER'] = {
     type = "OFFICER",
@@ -66,16 +67,16 @@ events = {
     type = "PARTY",
   },
   ['CHAT_MSG_PARTY_LEADER'] = {
-    type = "PARTY_LEADER",
+    type = "PARTY",
   },
   ['CHAT_MSG_RAID'] = {
     type = "RAID", 
   },
   ['CHAT_MSG_RAID_LEADER'] = {
-    type = "RAID_LEADER", 
+    type = "RAID", 
   },
   ['CHAT_MSG_RAID_WARNING'] = {
-    type = "RAID_WARNING", 
+    type = "RAID", 
   },
   ['CHAT_MSG_SAY'] = {
     type = "SAY",
@@ -84,19 +85,19 @@ events = {
     type = "SYSTEM",
   },
   ['CHAT_MSG_TEXT_EMOTE'] = {
-    type = "TEXT_EMOTE",
+    type = "SYSTEM",
   },
   ['CHAT_MSG_WHISPER'] = {
     type = "WHISPER",
   },
   ['CHAT_MSG_WHISPER_INFORM'] = {
-    type = "WHISPER_INFORM",
+    type = "WHISPER",
   },
   ['CHAT_MSG_YELL'] = {
     type = "YELL",
   },
   ['PARTY_LOOT_METHOD_CHANGED'] = {
-    type = "SYSTEM",
+    type = "LOOT",
   },
 
 }
@@ -119,7 +120,7 @@ VScreens_OptionsFrame:SetScript("OnShow", function(self)
     local dptitle = VScreens_OptionsFrame:CreateFontString(nil,"ARTWORK","GameFontNormal")
     dptitle:SetTextColor(1,1,1)
     dptitle:SetPoint("RIGHT",0,-40*counta+20)
-    dptitle:SetText(key)
+    dptitle:SetText(L[key])
     local editBox = CreateFrame("EditBox", "VScreens_Options_v_"..key, VScreens_OptionsFrame, "InputBoxTemplate")
     editBox:SetSize(100, 20)
     editBox:SetPoint("RIGHT",0,-40*counta)
@@ -136,7 +137,7 @@ VScreens_OptionsFrame:SetScript("OnShow", function(self)
         if count>15 then countx,count=countx+1,0 end
         local button = CreateFrame("CheckButton", "VScreens_Options_"..key, VScreens_OptionsFrame, "InterfaceOptionsCheckButtonTemplate")
         button:SetPoint("TOPLEFT", 32+200*countx, -32-32*count)
-        getglobal(button:GetName().."Text"):SetText(key)
+        getglobal(button:GetName().."Text"):SetText(L[key])
         if value == true then button:SetChecked(true) else button:SetChecked(false) end
     end 
     self.show = true
@@ -172,6 +173,7 @@ frame:SetFrameStrata("BACKGROUND")
 frame:SetWidth(64) -- Set these to whatever height/width is needed 
 frame:SetHeight(64) -- for your Texture
 frame:SetPoint("CENTER",0,0)
+
 frame:Show()
 
 local MessageScreen = frame:CreateFontString(nil, "ARTWORK")
@@ -180,23 +182,43 @@ MessageScreen:SetWidth(500)
 MessageScreen:SetJustifyH("LEFT")
 
 
+
 frame:RegisterEvent("ADDON_LOADED") 
 
 frame:SetScript("OnEvent", function(self, event,...) 
+    
     local message, sender, _, _, _, flags, _, _, channelName, _, _, guid = ...
     frameEvent(event,message, sender, flags, channelName,guid)
     if self[event] then
-
         return self[event](self, event, ...)
     end
 end )
+
+
+local function J_SetObjectColorWithCurrentLogColor(obj,event,channelName)
+  if event == "CHAT_MSG_CHANNEL" then
+    local J_channelId, J_channelName
+    local i
+    -- Max: 20 channels
+    for i=1,20 do
+      J_channelId,J_channelName = GetChannelName(i)
+      if channelName ~= nil and J_channelName == channelName then
+        events.type = "CHANNEL" .. J_channelId
+        break
+      end
+    end
+  end
+  if ChatTypeInfo[events.type] then
+    obj:SetTextColor(ChatTypeInfo[events.type].r, ChatTypeInfo[events.type].g, ChatTypeInfo[events.type].b, ChatTypeInfo[events.type].a)
+  end
+end
 
 function frameUpdate(self,elapsed)
     xx = xx + elapsed*VScreens_Options_v["ScreenSpeed"]
     frame:SetPoint("CENTER", VScreens_Options_v["ScreenRight"]-xx, 0)
 end
 function frameEvent(event,message, sender, flags, channelName,guid)
-    if VScreens_Options_v == nil or VScreens_Options == nil then return end
+    if VScreens_Options_v == nil or VScreens_Options == nil or event == "ADDON_LOADED" then return end
 
     if VScreens_Options[event] == false then return end
     MessageScreen = frame:CreateFontString(nil, "ARTWORK")
@@ -205,7 +227,12 @@ function frameEvent(event,message, sender, flags, channelName,guid)
     MessageScreen:SetJustifyH("LEFT")
     MessageScreen:SetPoint("CENTER", frame, "CENTER", VScreens_Options_v["ScreenRight"]+xx, random(VScreens_Options_v["ScreenBottom"],VScreens_Options_v["ScreenTop"]))
     MessageScreen:SetText(message)
+    J_SetObjectColorWithCurrentLogColor(MessageScreen,event,channelName)
 end
+
+
+
+
 
 function frame:ADDON_LOADED(event,...)
     frame:SetScript("OnUpdate", frameUpdate)
@@ -224,14 +251,9 @@ function frame:ADDON_LOADED(event,...)
         frame:RegisterEvent(event)
     end
 
-
+    
 
 end
-
-
-
-
-
 
 
 

@@ -1,12 +1,13 @@
-## Interface: 80100
+## Interface: 80200
 ## Title: VScreens
 ## Author: JANY
 ## Version: 8.1.5
-## Notes: VScreens
+## Notes: VScreens游戏弹幕
 ## SavedVariables: VScreens_Options,VScreens_Options_v
 
-
+localization.lua
 VScreens.lua
+
 
 
 
