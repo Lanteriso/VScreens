@@ -1,7 +1,7 @@
-## Interface: 80200
+## Interface: 80205
 ## Title: VScreens
 ## Author: JANY
-## Version: 8.1.5
+## Version: 20191110
 ## Notes: VScreens游戏弹幕
 ## SavedVariables: VScreens_Options,VScreens_Options_v
 

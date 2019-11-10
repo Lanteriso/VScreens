@@ -1,107 +1,136 @@
 local L = VScreens_L
-events = {
+local events = {
   ['CHAT_MSG_ACHIEVEMENT'] = {
-    type = "SYSTEM",
+    Info = "SYSTEM",
   },
   ['CHAT_MSG_BG_SYSTEM_ALLIANCE'] = {
-    type = "SYSTEM",
+    Info = "SYSTEM",
   },
   ['CHAT_MSG_BG_SYSTEM_HORDE'] = {
-    type = "SYSTEM",
+    Info = "SYSTEM",
   },
   ['CHAT_MSG_BG_SYSTEM_NEUTRAL'] = {
-    type = "SYSTEM",
+    Info = "SYSTEM",
   },
   ['CHAT_MSG_BN_WHISPER'] = {
-    type = "WHISPER",
+    Info = "WHISPER",
   },
   ['CHAT_MSG_BN_WHISPER_INFORM'] = {
-    type = "WHISPER",
+    Info = "WHISPER",
   },
   ['CHAT_MSG_CHANNEL'] = {
-    type = nil,
+    Info = nil,
   },
   ['CHAT_MSG_CHANNEL_NOTICE'] = {
-    type = nil,
+    Info = nil,
   },
   ['CHAT_MSG_EMOTE'] = {
-    type = "SYSTEM",
+    Info = "SYSTEM",
   },
   ['CHAT_MSG_GUILD'] = {
-    type = "GUILD",
+    Info = "GUILD",
   },
   ['CHAT_MSG_GUILD_ACHIEVEMENT'] = {
-    type = "GUILD",
+    Info = "GUILD",
   },
   ['CHAT_MSG_INSTANCE_CHAT'] = {
-    type = "INSTANCE_CHAT",
+    Info = "INSTANCE_CHAT",
   },
   ['CHAT_MSG_INSTANCE_CHAT_LEADER'] = {
-    type = "INSTANCE_CHAT",
+    Info = "INSTANCE_CHAT",
   },
   ['CHAT_MSG_LOOT'] = {
-    type = "LOOT",
+    Info = "LOOT",
   },
   ['CHAT_MSG_MONEY'] = {
-    type = "SYSTEM",
+    Info = "SYSTEM",
   },
   ['CHAT_MSG_CURRENCY'] = {
-    type = "SYSTEM",
+    Info = "SYSTEM",
   },
   ['CHAT_MSG_MONSTER_EMOTE'] = {
-    type = "SYSTEM",
+    Info = "SYSTEM",
   },
   ['CHAT_MSG_MONSTER_SAY'] = {
-    type = "SAY",
+    Info = "SAY",
   },
   ['CHAT_MSG_MONSTER_WHISPER'] = {
-    type = "WHISPER",
+    Info = "WHISPER",
   },
   ['CHAT_MSG_MONSTER_YELL'] = {
-    type = "YELL",
+    Info = "YELL",
   },
   ['CHAT_MSG_OFFICER'] = {
-    type = "OFFICER",
+    Info = "OFFICER",
   },
   ['CHAT_MSG_PARTY'] = {
-    type = "PARTY",
+    Info = "PARTY",
   },
   ['CHAT_MSG_PARTY_LEADER'] = {
-    type = "PARTY",
+    Info = "PARTY",
   },
   ['CHAT_MSG_RAID'] = {
-    type = "RAID", 
+    Info = "RAID", 
   },
   ['CHAT_MSG_RAID_LEADER'] = {
-    type = "RAID", 
+    Info = "RAID", 
   },
   ['CHAT_MSG_RAID_WARNING'] = {
-    type = "RAID", 
+    Info = "RAID", 
   },
   ['CHAT_MSG_SAY'] = {
-    type = "SAY",
+    Info = "SAY",
   },
   ['CHAT_MSG_SYSTEM'] = {
-    type = "SYSTEM",
+    Info = "SYSTEM",
   },
   ['CHAT_MSG_TEXT_EMOTE'] = {
-    type = "SYSTEM",
+    Info = "SYSTEM",
   },
   ['CHAT_MSG_WHISPER'] = {
-    type = "WHISPER",
+    Info = "WHISPER",
   },
   ['CHAT_MSG_WHISPER_INFORM'] = {
-    type = "WHISPER",
+    Info = "WHISPER",
   },
   ['CHAT_MSG_YELL'] = {
-    type = "YELL",
+    Info = "YELL",
   },
   ['PARTY_LOOT_METHOD_CHANGED'] = {
-    type = "LOOT",
+    Info = "LOOT",
   },
 
 }
-
+local Drillingrig = {
+  ["64"] = {
+    Name = "饱食的齿轮噬咬者",
+    Coordinates = "78,51",
+  },
+    ["28"] = {
+    Name = "老獠",
+    Coordinates = "55,37",
+  },
+    ["35"] = {
+    Name = "碎地者高洛克",
+    Coordinates = "62,26",
+  },
+    ["73"] = {
+    Name = "腐蚀性的机甲软泥",
+    Coordinates = "66,60",
+  },
+    ["88"] = {
+    Name = "防窃者首领",
+    Coordinates = "68,48",
+  },
+    ["99"] = {
+    Name = "宝石粉碎者",
+    Coordinates = "60,66",
+  },
+    ["41"] = {
+    Name = "燃沸",
+    Coordinates = "51,50",
+  },
+}
 local xx = 1
 
 
@@ -203,13 +232,13 @@ local function J_SetObjectColorWithCurrentLogColor(obj,event,channelName)
     for i=1,20 do
       J_channelId,J_channelName = GetChannelName(i)
       if channelName ~= nil and J_channelName == channelName then
-        events.type = "CHANNEL" .. J_channelId
+        events[event].Info = "CHANNEL" .. J_channelId
         break
       end
     end
   end
-  if ChatTypeInfo[events.type] then
-    obj:SetTextColor(ChatTypeInfo[events.type].r, ChatTypeInfo[events.type].g, ChatTypeInfo[events.type].b, ChatTypeInfo[events.type].a)
+  if ChatTypeInfo[events[event].Info] then
+    obj:SetTextColor(ChatTypeInfo[events[event].Info].r, ChatTypeInfo[events[event].Info].g, ChatTypeInfo[events[event].Info].b, ChatTypeInfo[events[event].Info].a)
   end
 end
 
@@ -217,10 +246,24 @@ function frameUpdate(self,elapsed)
     xx = xx + elapsed*VScreens_Options_v["ScreenSpeed"]
     frame:SetPoint("CENTER", VScreens_Options_v["ScreenRight"]-xx, 0)
 end
+
+local function SendDrillingrig(event,message)
+  for k,v in pairs(Drillingrig) do
+    if string.find(message,k) then
+        SendChatMessage(v.Name..v.Coordinates, "WHISPER", nil,GetUnitName("player"))
+    end
+  end 
+end
 function frameEvent(event,message, sender, flags, channelName,guid)
     if VScreens_Options_v == nil or VScreens_Options == nil or event == "ADDON_LOADED" then return end
-
     if VScreens_Options[event] == false then return end
+    if event == "CHAT_MSG_CHANNEL_NOTICE" then
+    if message == "YOU_JOINED" or message == "YOU_CHANGED" or message == "YOU_LEFT" then return end
+    end
+    if event == 'CHAT_MSG_ACHIEVEMENT' or event == 'CHAT_MSG_GUILD_ACHIEVEMENT' then message = string.format(message,sender) end
+    if string.find(message,"1分钟") and event == 'CHAT_MSG_MONSTER_EMOTE' then
+        SendDrillingrig(event,message)
+    end
     MessageScreen = frame:CreateFontString(nil, "ARTWORK")
     MessageScreen:SetFont(GameFontNormal:GetFont(), VScreens_Options_v["ScreenFontsize"])
     MessageScreen:SetWidth(500)
@@ -229,6 +272,7 @@ function frameEvent(event,message, sender, flags, channelName,guid)
     MessageScreen:SetText(message)
     J_SetObjectColorWithCurrentLogColor(MessageScreen,event,channelName)
 end
+
 
 
 
